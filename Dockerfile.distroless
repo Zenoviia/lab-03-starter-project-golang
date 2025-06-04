@@ -1,0 +1,13 @@
+FROM golang:1.20 AS builderAdd commentMore actions
+WORKDIR /app
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o fizzbuzz
+
+FROM gcr.io/distroless/static
+WORKDIR /app
+
+COPY --from=builder /app/fizzbuzz .
+COPY --from=builder /app/templates ./templates
+
+CMD ["./fizzbuzz", "serve"]
